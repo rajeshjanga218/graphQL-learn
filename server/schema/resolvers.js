@@ -14,9 +14,11 @@ const resolvers = {
     // movie resolvers
     movies: () => movies,
     movie: (parent, args) => {
-      const id = args.id;
-      const movie = movies.filter((item) => item.id === id);
-      return movie[0];
+      const name = args.name;
+      const searchedMovies = movies.filter((item) =>
+        item.name.toLowerCase().includes(name.toLowerCase())
+      );
+      return searchedMovies;
     },
   },
 

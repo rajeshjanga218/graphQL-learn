@@ -11,10 +11,10 @@ const QUERY_ALL_MOVIES = gql`
 `;
 
 const GET_MOVIE = gql`
-  query getMovie($input:){
-    movie(){
-        id
-        name
+  query getMovie($name: String) {
+    movie(name: $name) {
+      id
+      name
     }
   }
 `;
@@ -22,15 +22,22 @@ const GET_MOVIE = gql`
 function Movies() {
   const [inputText, setInputText] = useState("");
   const { data, loading, error } = useQuery(QUERY_ALL_MOVIES);
+  const [
+    getMovieByName,
+    { data: movieData, error: movieError, loading: movieLoaing },
+  ] = useLazyQuery(GET_MOVIE);
+  console.log(movieData);
+
   if (error) return <p>{error}</p>;
   if (loading) return <p>Loading...</p>;
-  const [
-    getMovie,
-    { data: movieData, error: movieError, loading: movieLoaing },
-  ] = useLazyQuery(QUERY_ALL_MOVIES);
-  console.log(data);
 
-  const handleSearchBtn = () => {};
+  // const handleSearchBtn = () => {
+  //   getMovieByName({
+  //     variables: {
+  //       name: inputText,
+  //     },
+  //   });
+  // };
   return (
     <div>
       <h1>List of Movies</h1>
@@ -38,16 +45,31 @@ function Movies() {
         {data &&
           data.movies.map((movie) => <li key={movie.id}>{movie.name}</li>)}
       </ul>
-      <h1>search movie and its details</h1>
-      <input
-        type="text"
-        className=""
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-      />
-      <button type="button" onClick={handleSearchBtn}>
-        search
-      </button>
+      <div>
+        <h1>search movie and its details</h1>
+        <input
+          type="text"
+          className=""
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+        />
+        <button
+          type="button"
+          onClick={() =>
+            getMovieByName({
+              variables: {
+                name: inputText,
+              },
+            })
+          }
+        >
+          search
+        </button>
+        <div>
+          {movieData &&
+            movieData.movie.map((item) => <div key={item.id}>{item.name}</div>)}
+        </div>
+      </div>
     </div>
   );
 }
